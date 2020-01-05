@@ -1,0 +1,2 @@
+include ':app', ':ipc_client', ':ipc_server'
+rootProject.name='PengSheng'
