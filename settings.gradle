@@ -1,2 +1,2 @@
-include ':app', ':ipc_client', ':ipc_server'
+include ':app', ':ipc_client', ':ipc_server', ':ndkrtspserver', ':ndk'
 rootProject.name='PengSheng'
