@@ -22,6 +22,8 @@ android {
             cmake {
                 cppFlags ""
                 abiFilters "armeabi-v7a"
+                //LLVM libc++ 运行时（共享）。
+//                arguments "-DANDROID_STL=c++_shared"
             }
         }
     }

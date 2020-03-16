@@ -15,11 +15,12 @@ public class ThreadPool {
     // CPU的核心数
     private static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
     // 线程池的核心线程数
-    private static final int CORE_POOL_SIZE = CPU_COUNT*3 + 1;
+    private static final int CORE_POOL_SIZE = CPU_COUNT*6 + 1;
     // 线程池的最大的数量
-    private static final int MAX_POOL_SIZE = CPU_COUNT * 6 + 1;
+//    private static final int MAX_POOL_SIZE = CPU_COUNT * 6 + 1;
+    private static final int MAX_POOL_SIZE = Integer.MAX_VALUE;
     // 允许线程闲置多长时间，如果超过这个时间则回收
-    private static final long KEEP_ALIVE = 10L;
+    private static final long KEEP_ALIVE = 1L;
     // 线程工厂
     private static final ThreadFactory mThreadFactory = new ThreadFactory() {
         // 安全的计数器
@@ -46,6 +47,13 @@ public class ThreadPool {
     }
 
     public void execute(Runnable runnable) {
+//        getPoolSize 获取实际的线程数量
+//
+//        getActiveCount 获取正在运行的线程数量
+//
+//        getQueue().size() 获取队列中等待的线程数量
+        ELog.e(TAG,"getPoolSize:"+THREAD_POOL_EXECUTOR.getPoolSize()+" getActiveCount:"+THREAD_POOL_EXECUTOR.getActiveCount()+
+                " getQueue().size："+THREAD_POOL_EXECUTOR.getQueue().size());
         THREAD_POOL_EXECUTOR.execute(runnable);
     }
 }

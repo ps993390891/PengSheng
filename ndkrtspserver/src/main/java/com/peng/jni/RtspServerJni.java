@@ -102,6 +102,7 @@ public class RtspServerJni implements OnClientNumberListener, CameraUtil.Preview
                 h264Encoder.startMediaCode(640, 480, RtspServerJni.this);
                 audioRecordUtils.startRecord(RtspServerJni.this);
                 cameraUtil.startCamera(RtspServerJni.this);
+                ELog.e(TAG, "---->>>startCode ok");
             }
         });
     }

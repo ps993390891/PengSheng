@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.ByteBuffer;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.TimeUnit;
 
 public class H264Encoder {
 
@@ -25,9 +26,10 @@ public class H264Encoder {
     private int videoHeight;
     private int bufferSize;
     private byte[] yuv420 = null;
+    private byte[] yv12 = null;
     private byte[] ppsSpsData = null;
     //编码等待超时时间 微秒
-    private static final int TIMEOUT_USEC = 10000;
+    private static final int TIMEOUT_USEC = 20000;
     //帧率
     private int videoFrameRate = 15;
     private boolean isEnStop = true;
@@ -95,13 +97,17 @@ public class H264Encoder {
             @Override
             public void run() {
                 ELog.e(TAG,"startEnCode");
+                yuv420 = new byte[bufferSize];
                 while (!isStop) {
                     try {
-                        yuv420 = new byte[bufferSize];
-                        YV12toI420(queue.take(), yuv420, videoWidth, videoHeight);
+                        yv12 = queue.poll(100, TimeUnit.MILLISECONDS);
+                        if(yv12 == null){
+                            continue;
+                        }
+                        YV12toI420(yv12, yuv420, videoWidth, videoHeight);
                         ByteBuffer[] inputBuffers = mMediaCodec.getInputBuffers();
                         //<0表示一直等待，不丢帧。>0表示等待时间，微秒级. 0表示立即返回
-                        int inputBufferIndex = mMediaCodec.dequeueInputBuffer(-1);
+                        int inputBufferIndex = mMediaCodec.dequeueInputBuffer(0);
                         if (inputBufferIndex >= 0) {
                             ByteBuffer inputBuffer = inputBuffers[inputBufferIndex];
                             inputBuffer.clear();
@@ -116,6 +122,7 @@ public class H264Encoder {
                         ELog.i(TAG, "EnCode Exception");
                     }
                 }
+                ELog.i(TAG, "stopVideoEncoder end");
                 isEnStop = true;
             }
         });
@@ -203,7 +210,7 @@ public class H264Encoder {
                 queue.clear();
             }
             isStop = true;
-            while (isEnStop) {
+            while (!isEnStop) {
                 Thread.sleep(10);
             }
             if (outputStream != null) {
